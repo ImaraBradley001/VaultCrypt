@@ -1,17 +1,32 @@
+#include "files.h"
+#include "modes.h"
+#include "osrng.h"
+#include <array>
+#include <fstream>
+#include <iostream>
 #include "cryptlib.h"
 #include "rijndael.h"
-#include "modes.h"
-#include "files.h"
 #include "osrng.h"
 #include "hex.h"
 #include <iostream>
 #include <string>
 #include <Windows.h>
-#include <typeinfo>
-#include <fstream>
 #include <sys/stat.h>
+#include <filesystem>
+#include <vector>
+#include <cstdio>
+#include <iostream>
+#include <memory>
+#include <stdexcept>
+#include <string>
+#include <array>
+
+
+namespace fs = std::filesystem;
 
 using namespace CryptoPP;
+using aes_key_t = std::array<CryptoPP::byte, CryptoPP::AES::DEFAULT_KEYLENGTH>;
+using aes_iv_t = std::array<CryptoPP::byte, CryptoPP::AES::BLOCKSIZE>;
 
 SecByteBlock generateRandomKey(int size = 32) {
     AutoSeededRandomPool prng;
@@ -40,99 +55,102 @@ SecByteBlock generateByteBlock(std::string in_string) {
     return byteblock;
 }
 
-std::string encrytPlainText(char * &plainText, SecByteBlock key, SecByteBlock iv) {
-    std::string cipherText;
-    for (int i = 0; i < 100000000; i++) std::cout << plainText[i] << std::endl;
+void encrypt(SecByteBlock key, SecByteBlock iv,
+    const std::string& filename_in, const std::string& filename_out) {
+    CryptoPP::CFB_Mode<CryptoPP::AES>::Encryption cipher{};
+    cipher.SetKeyWithIV(key.data(), key.size(), iv.data());
 
-    try
-    {
-        CBC_Mode< AES >::Encryption e;
-        e.SetKeyWithIV(key, key.size(), iv);
+    std::ifstream in{ filename_in, std::ios::binary };
+    std::ofstream out{ filename_out, std::ios::binary };
 
-        StringSource s(plainText, true,
-           new StreamTransformationFilter(e,
-                new StringSink(cipherText)
-            ) // StreamTransformationFilter
-        ); // StringSource
-        return cipherText;
-    }
-    catch (const Exception& e)
-    {
-        std::cerr << e.what() << std::endl;
-        exit(1);
-    }
+    CryptoPP::FileSource{ in, /*pumpAll=*/true,
+                         new CryptoPP::StreamTransformationFilter{
+                             cipher, new CryptoPP::FileSink{out}} };
+    out.close();
+    in.close();
 }
 
-std::string decrytCipherText(std::string cipherText, SecByteBlock key, SecByteBlock salt) {
-    std::string plainText;
+void decrypt(SecByteBlock key, SecByteBlock iv,
+    const std::string& filename_in, const std::string& filename_out) {
+    CryptoPP::CFB_Mode<CryptoPP::AES>::Decryption cipher{};
+    cipher.SetKeyWithIV(key.data(), key.size(), iv.data());
 
+    std::ifstream in{ filename_in, std::ios::binary };
+    std::ofstream out{ filename_out, std::ios::binary };
 
-    try
-    {
-        CBC_Mode< AES >::Decryption d;
-        d.SetKeyWithIV(key, key.size(), salt);
-
-        StringSource s(cipherText, true,
-            new StreamTransformationFilter(d,
-                new StringSink(plainText),
-                CryptoPP::BlockPaddingSchemeDef::BlockPaddingScheme::PKCS_PADDING
-            ) // StreamTransformationFilter
-        ); // StringSource
-       // std::cout << typeid(plainText) << std::endl;
-
-        return plainText;
-    }
-    catch (const Exception& e)
-    {
-        std::cerr << e.what() << std::endl;
-        std::cerr << "decryption failed" << std::endl;
-        exit(1);
-    }
+    CryptoPP::FileSource{ in, /*pumpAll=*/true,
+                         new CryptoPP::StreamTransformationFilter{
+                             cipher, new CryptoPP::FileSink{out}} };
+    out.close();
+    in.close();
 }
 
-int getFileSize(std::string filename) {
-    struct stat results;
-
-    if (stat(filename.c_str(), &results) == 0)
-        // The size of the file in bytes is in
-        return results.st_size;
-    else {
-        // An error occurred
-        return 0;
+std::vector<std::string> generate_file_list(const std::filesystem::path& path) {
+    std::vector<std::string> allfiles;
+    for (const auto& p : std::filesystem::recursive_directory_iterator(path)) {
+        if (!std::filesystem::is_directory(p)) {
+            allfiles.push_back(p.path().u8string());
+        }
     }
-}
-char * readFileData(std::string filename, int filesize) {
-    char* fileData = new char[filesize];
-    std::ifstream f(filename, std::fstream::binary);
-    if (f) {
-        f.read(fileData, filesize);
-        return fileData;
-    }
+    return allfiles;
 }
 
-int main(int argc, char * argv[]) {
-    /*
-    std::string password = argv[1], salt = argv[2];
+std::string exec(const char* cmd) {
+    std::array<char, 128> buffer;
+    std::string result;
+    std::unique_ptr<FILE, decltype(&_pclose)> pipe(_popen(cmd, "r"), _pclose);
+    if (!pipe) {
+        throw std::runtime_error("popen() failed!");
+    }
+    while (fgets(buffer.data(), buffer.size(), pipe.get()) != nullptr) {
+        result += buffer.data();
+    }
+    return result;
+}
+
+int main(int argc, char** argv) {
+
+    //std::cout << CryptoPP::AES::BLOCKSIZE << std::endl;
+ 
+    std::string filepath = argv[1];
+
+    std::string base_filepath = filepath.substr(filepath.find_last_of("/\\") + 1);
+
+    SecByteBlock key = generateKey("hello", "hello");
+    SecByteBlock iv = generateByteBlock("1234567890abcdef");
+
     HexEncoder encoder(new FileSink(std::cout));
-    SecByteBlock key = generateKey(password, salt);
-    SecByteBlock iv = generateByteBlock("hoesinthesouth02");
-    std::string plainText = "An encryption algo", cipherText = encrytPlainText(plainText, key, iv);
-    std::string decryptedCipherText = decrytCipherText(cipherText, key, iv);
-    bool decryptionWasSuccessful = decryptedCipherText == plainText;
     std::cout << "Key:";
     encoder.Put(key, key.size());
     std::cout << std::endl;
     std::cout << "Iv:";
     encoder.Put(iv, iv.size());
     std::cout << std::endl;
-    std::cout << "Plain Text: " << plainText << ":" << std::endl;
-    std::cout << "Cipher Text: " << cipherText << std::endl;
-    std::cout << "Decryption was successful: " << std::boolalpha << decryptionWasSuccessful << std::endl;
-    */
-    std::string filename = argv[1];
-    int filesize = getFileSize(filename);
-    char* data = readFileData(filename, filesize);
-    SecByteBlock key = generateRandomKey(), iv=generateByteBlock("Helloworld123456");
-    //std::cout << encrytPlainText(data, key, iv);
-    //for (int i = 0; i < filesize; i++) std::cout << data[i] << std::endl;
+
+    // encrypt
+    encrypt(key, iv, filepath, filepath+"_encrypted");
+    
+    //overwrite and rename files
+    std::ofstream out{ filepath, std::ios::binary};
+    out.close();
+    std::string command;
+    command += "del /f /q " + filepath + " &&  ren " + filepath + "_encrypted " + base_filepath;
+    exec(command.c_str());
+    command = "";
+    // decrypt
+    decrypt(key, iv, filepath, filepath + "_decrypted");
+    //overwrite and rename files
+    std::ofstream out2{ filepath, std::ios::binary };
+    out2.close();
+    command += "del /f /q " + filepath + " &&  ren " + filepath + "_decrypted " + base_filepath;
+    exec(command.c_str());
+    return 0;
+    /*
+    std::vector<std::string> files = generate_file_list("./");
+    for (auto& f : files) {
+        std::cout << f << std::endl;
+    }*/
+    
 }
+    
+

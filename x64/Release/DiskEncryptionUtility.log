@@ -1,7 +1,8 @@
 ﻿  main.cpp
+C:\Users\2022\Desktop\PROJECTS\C++\DiskEncryptionUtility\main.cpp(105,58): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
   Generating code
-  47 of 838 functions ( 5.6%) were compiled, the rest were copied from previous compilation.
-    2 functions were new in current compilation
-    52 functions had inline decision re-evaluated but remain unchanged
+  117 of 1193 functions ( 9.8%) were compiled, the rest were copied from previous compilation.
+    96 functions were new in current compilation
+    125 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
   DiskEncryptionUtility.vcxproj -> C:\Users\2022\Desktop\PROJECTS\C++\DiskEncryptionUtility\x64\Release\DiskEncryptionUtility.exe
