@@ -21,39 +21,63 @@
 using aes_key_t = std::array<CryptoPP::byte, CryptoPP::AES::DEFAULT_KEYLENGTH>;
 using aes_iv_t = std::array<CryptoPP::byte, CryptoPP::AES::BLOCKSIZE>;
 
+
+int getFileSize(std::string filename) {
+    struct stat results;
+
+    if (stat(filename.c_str(), &results) == 0) return results.st_size;
+    return 0;
+}
+char* readFileData(std::string filename, int filesize) {
+    char* fileData = new char[filesize];
+    std::ifstream f(filename, std::fstream::binary);
+    if (f) {
+        f.read(fileData, filesize);
+        return fileData;
+    }
+}
+
 void encrypt(const aes_key_t& key, const aes_iv_t& iv,
-    const std::string& filename_in, const std::string& filename_out) {
+    const std::string& filename) {
     CryptoPP::CFB_Mode<CryptoPP::AES>::Encryption cipher{};
     cipher.SetKeyWithIV(key.data(), key.size(), iv.data());
+    int filesize = getFileSize(filename);
+    std::cout << "FILESIZE:" << filesize << std::endl;
+    char* filedata = readFileData(filename, filesize);
 
-    std::ifstream in{ filename_in, std::ios::binary };
-    std::ofstream out{ filename_out, std::ios::binary };
+    //std::ifstream in{ filename_in, std::ios::binary };
+    std::ofstream out{ filename, std::ios::binary };
 
-    CryptoPP::FileSource{ in, /*pumpAll=*/true,
+    CryptoPP::ArraySource{ filedata, /*pumpAll=*/true,
                          new CryptoPP::StreamTransformationFilter{
                              cipher, new CryptoPP::FileSink{out}} };
     out.close();
-    in.close();
 }
 
 void decrypt(const aes_key_t& key, const aes_iv_t& iv,
-    const std::string& filename_in, const std::string& filename_out) {
+    const std::string& filename) {
     CryptoPP::CFB_Mode<CryptoPP::AES>::Decryption cipher{};
     cipher.SetKeyWithIV(key.data(), key.size(), iv.data());
+    int filesize = getFileSize(filename);
+    std::cout << "FILESIZE:" << filesize << std::endl;
+    char* filedata = readFileData(filename, filesize);
 
-    std::ifstream in{ filename_in, std::ios::binary };
-    std::ofstream out{ filename_out, std::ios::binary };
+    //std::ifstream in{ filename_in, std::ios::binary };
+    std::ofstream out{ filename, std::ios::binary };
 
-    CryptoPP::FileSource{ in, /*pumpAll=*/true,
+    CryptoPP::ArraySource{ filedata, /*pumpAll=*/true,
                          new CryptoPP::StreamTransformationFilter{
                              cipher, new CryptoPP::FileSink{out}} };
     out.close();
-    in.close();
 }
+
+
 
 int main(int argc, char** argv) {
 
-    std::cout << CryptoPP::AES::BLOCKSIZE << std::endl;
+    //std::cout << CryptoPP::AES::BLOCKSIZE << std::endl;
+
+    std::string filename = argv[1];
 
     CryptoPP::AutoSeededRandomPool rng{};
 
@@ -66,23 +90,10 @@ int main(int argc, char** argv) {
     rng.GenerateBlock(iv.data(), iv.size());
 
     // encrypt
-    encrypt(key, iv, "C:\\users\\2022\\desktop\\test.jpg", "C:\\users\\2022\\desktop\\test_encrypted.jpg");
-    
-    //overwrite and rename files
-    std::ofstream out{ "C:\\users\\2022\\desktop\\test.jpg", std::ios::binary};
-    out.close();
-    system("del /f /q C:\\users\\2022\\desktop\\test.jpg && ren C:\\users\\2022\\desktop\\test_encrypted.jpg test.jpg");
-    
-    int x;
-    std::cin >> x;
-
+    encrypt(key, iv, filename);
     // decrypt
-    decrypt(key, iv, "C:\\users\\2022\\desktop\\test.jpg", "C:\\users\\2022\\desktop\\test_decrypted.jpg");
+    decrypt(key, iv, filename);
 
-    //overwrite and rename files
-    std::ofstream out2{ "C:\\users\\2022\\desktop\\test.jpg", std::ios::binary };
-    out2.close();
-    system("del /f /q C:\\users\\2022\\desktop\\test.jpg && ren C:\\users\\2022\\desktop\\test_decrypted.jpg test.jpg");
 
     return 0;
 }
