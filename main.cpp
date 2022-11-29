@@ -1,12 +1,10 @@
 #include "files.h"
 #include "modes.h"
 #include "osrng.h"
-#include <array>
 #include <fstream>
 #include <iostream>
 #include "cryptlib.h"
 #include "rijndael.h"
-#include "osrng.h"
 #include "hex.h"
 #include <iostream>
 #include <string>
