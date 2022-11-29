@@ -18,12 +18,11 @@
 #include <stdexcept>
 #include <string>
 #include <array>
+#include "consoleUI.h"
 
 namespace fs = std::filesystem;
 
 using namespace CryptoPP;
-using aes_key_t = std::array<CryptoPP::byte, CryptoPP::AES::DEFAULT_KEYLENGTH>;
-using aes_iv_t = std::array<CryptoPP::byte, CryptoPP::AES::BLOCKSIZE>;
 
 SecByteBlock generateRandomKey(int size = 32) {
     AutoSeededRandomPool prng;
@@ -109,7 +108,7 @@ std::string exec(const char* cmd) {
 int main(int argc, char** argv) {
 
     //std::cout << CryptoPP::AES::BLOCKSIZE << std::endl;
-
+    /*
 
     std::string filepath = argv[1];
 
@@ -125,8 +124,6 @@ int main(int argc, char** argv) {
     std::cout << "Iv:";
     encoder.Put(iv, iv.size());
     std::cout << std::endl;
-    SecByteBlock key = generateKey("hello", "hello");
-    SecByteBlock iv = generateByteBlock("1234567890abcdef");
     // encrypt
     encrypt(key, iv, filepath, filepath+"_encrypted");    
     //overwrite and rename files
@@ -146,12 +143,14 @@ int main(int argc, char** argv) {
     return 0;
     system(command.c_str());
     return 0;
+    */
 
     /*
     std::vector<std::string> files = generate_file_list("./");
     for (auto& f : files) {
         std::cout << f << std::endl;
     }*/
+    LoadUserMenu();
     
 }
     
