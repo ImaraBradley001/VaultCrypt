@@ -151,11 +151,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="include\consoleUI.cpp" />
+    <ClCompile Include="include\additionalUtils.cpp" />
+    <ClCompile Include="include\cryptographicUtils.cpp" />
+    <ClCompile Include="include\progressBar.cpp" />
     <ClCompile Include="src\main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\consoleUI.h" />
+    <ClInclude Include="include\additionalUtils.h" />
+    <ClInclude Include="include\cryptographicUtils.h" />
+    <ClInclude Include="include\progressBar.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
