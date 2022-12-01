@@ -28,6 +28,10 @@ std::string ExecuteCommand(const char* cmd) {
 
 
 std::vector<std::string> GenerateFileList(const std::filesystem::path& path) {
+    if (!std::filesystem::exists(path)) {
+        std::cout << "The path entered is incorrect or does not exist!";
+        exit(1);
+    }
     std::vector<std::string> allfiles;
     for (const auto& p : std::filesystem::recursive_directory_iterator(path)) {
         if (!std::filesystem::is_directory(p)) {

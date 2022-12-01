@@ -27,6 +27,12 @@
     <ClCompile Include="include\cryptographicUtils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="include\consoleUI.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="include\help.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\progressBar.h">
@@ -36,6 +42,12 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="include\cryptographicUtils.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\consoleUI.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\help.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
