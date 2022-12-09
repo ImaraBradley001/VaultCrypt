@@ -31,6 +31,6 @@ void ConsoleUI::LoadEnterPasswordScreen() {
 
 void ConsoleUI::LoadEnterPathScreen() {
 		system("cls");
-		std::cout << "Enter the path to recursively encrypt:";
+		std::cout << "Enter the path to recursively encrypt/decrypt:";
 		std::cin >> path;
 	}
