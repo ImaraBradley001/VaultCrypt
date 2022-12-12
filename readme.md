@@ -1,36 +1,38 @@
-# Pixel Time
+# ValtCrypt
 
 ## Description
-Welcome to Pixel Time, the ultimate digital clock app for your PC! With a sleek and stylish design, Pixel Time makes it easy to keep track of the time, no matter where you are.
+Vault Crypt is a program that can be used to encrypt/decrypt files using AES-CDC-256 algorithm. The encryption/decryption is performed using a user-generated password, hard coded salt and initialization vector. For simplicity, all you need to remember is your password :)
 
 ## Preview
-![alt text](https://github.com/ImaraBradley001/PixelTime/raw/master/preview/1.png)
+![alt text](https://github.com/ImaraBradley001/VaultCrypt/raw/master/preview/1.png)
 
 ## Getting Started
 
 ### Dependencies
 
-*  Windows 10
-* Python 3.8 or higher
-* Kivy 2.0.0 or higher
-* kivymd 1.0.0 or higher
+* Windows 10
+*  C++ 17
+* Cryptopp
+* Boost
+* Visual Studio IDE
 
 ### Installing
 
 * To install from this git repository, run the following commands
 ```
-git clone https://github.com/ImaraBradley001/PixelTime.git
-cd PixelTime
-pip install -r requirements.txt
+git clone https://github.com/ImaraBradley001/VaultCrypt.git
+cd VaultCrypt
+# Compile the project with visual studio 
 ```
+
 * Or simply download the latest release binary
 
-### Executing Pixel Time
-* To run FlashPad, simply run the following command from the downloaded repository.
+### Executing Vault Crypt
+* To run VaultCrypt, simply run the following command from the downloaded repository after compiling the project.
 ```
-python src/main.py
+start x64/release/DiskEncryptionUtility.exe
 ```
-* Or simply run the downloaded binary PixelTime.exe 
+* Or simply run the downloaded binary DiskEncryptionUtility.exe 
 
 ## Authors
 
