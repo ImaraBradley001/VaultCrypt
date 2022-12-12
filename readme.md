@@ -32,7 +32,10 @@ cd VaultCrypt
 ```
 start x64/release/DiskEncryptionUtility.exe
 ```
-* Or simply run the downloaded binary DiskEncryptionUtility.exe 
+* Or simply run the downloaded binary VaultCrypt.exe 
+
+### Possible Issues
+* Do not attemp to decrypt files that have not been encrypted by this program as it may result in irreversible data loss
 
 ## Authors
 
