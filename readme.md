@@ -1,7 +1,7 @@
 # ValtCrypt
 
 ## Description
-Vault Crypt is a program that can be used to encrypt/decrypt files using AES-CDC-256 algorithm. The encryption/decryption is performed using a user-generated password, hard coded salt and initialization vector. For simplicity, all you need to remember is your password :)
+Vault Crypt is a program that can be used to encrypt/decrypt files using AES-CDC-256 algorithm. The encryption/decryption is performed using a user-generated password, hard coded salt and initialization vector. For simplicity, all you need to remember is your password :) The program has a simple console UI that is easy to navigate.
 
 ## Preview
 ![alt text](https://github.com/ImaraBradley001/VaultCrypt/raw/master/Preview/1.png)
